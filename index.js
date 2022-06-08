@@ -137,14 +137,23 @@ app.post("/new/absentee", async (req, res) => {
 app.post("/new/token", async (req, res) => {
     try {
         const { id, date, mess, owner, non_veg } = req.body;
-        const newToken = await pool.query("INSERT INTO token (token_id, valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, date, mess, owner, non_veg]);
-        console.log("New token has been logged.");
-        res.json(newToken.rows[0]);
+        if (id === 'undefined') {
+            const newToken = await pool.query("INSERT INTO token (token_id, valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, date, mess, owner, non_veg]);
+            console.log("New token has been logged.");
+            res.json(newToken.rows[0]);
+        }
+        else {
+            const newToken = await pool.query("INSERT INTO token (valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4) RETURNING *", [date, mess, owner, non_veg]);
+            console.log("New token has been logged.");
+            res.json(newToken.rows[0]);
+        }
     } catch (err) {
         console.log(err.message);
         res.json();
     }
 })
+
+
 
 app.listen(5000, () => {
     console.log("Server has started on port 5000");
