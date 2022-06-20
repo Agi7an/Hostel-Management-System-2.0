@@ -130,20 +130,12 @@ router.post("/new/absentee", async (req, res) => {
 // Insert new token
 router.post("/new/token", async (req, res) => {
     try {
-        const { id, date, owner, non_veg } = req.body;
+        const { date, owner, non_veg } = req.body;
         const mess_query = await pool.query("SELECT mess_id FROM block WHERE id = (SELECT block_id FROM resident WHERE id = $1)", [owner]);
         const mess_name = mess_query.rows[0].mess_id;
-
-        if (id === 'undefined') {
-            const newToken = await pool.query("INSERT INTO token (token_id, valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, date, mess_name, owner, non_veg]);
-            console.log("New token has been logged.");
-            res.json(newToken.rows[0]);
-        }
-        else {
-            const newToken = await pool.query("INSERT INTO token (valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4) RETURNING *", [date, mess_name, owner, non_veg]);
-            console.log("New token has been logged.");
-            res.json(newToken.rows[0]);
-        }
+        const newToken = await pool.query("INSERT INTO token (valid_date, mess_name, owner_id, is_non_veg) VALUES($1, $2, $3, $4) RETURNING *", [date, mess_name, owner, non_veg]);
+        console.log("New token has been logged.");
+        res.json(newToken.rows[0]);
     } catch (err) {
         console.log(err.message);
         res.json({ "message": err.message });
@@ -379,7 +371,7 @@ router.put("/supervisor/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -412,7 +404,7 @@ router.put("/staff/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -445,7 +437,7 @@ router.put("/event/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -460,7 +452,7 @@ router.put("/attendance/:date", async (req, res) => {
         res.json(updatedAttendance.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -491,7 +483,7 @@ router.put("/absentee/:id/:date", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -526,7 +518,7 @@ router.put("/token/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -539,7 +531,7 @@ router.get("/users", async (req, res) => {
         res.json(ids);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -551,7 +543,7 @@ router.get("/user/:id", async (req, res) => {
         res.json(details.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -563,7 +555,7 @@ router.get("/resident/:id", async (req, res) => {
         res.json(resident.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -575,7 +567,7 @@ router.get("/rt/:id", async (req, res) => {
         res.json(rt.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -587,7 +579,7 @@ router.get("/supervisor/:id", async (req, res) => {
         res.json(supervisor.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -599,7 +591,7 @@ router.get("/staff/:id", async (req, res) => {
         res.json(staff.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -613,7 +605,7 @@ router.get("/event/:id", async (req, res) => {
     }
     catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -625,7 +617,7 @@ router.get("/attendance", async (req, res) => {
         res.json(dates);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -636,7 +628,7 @@ router.get("/absentees", async (req, res) => {
         res.json(absentees.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -648,7 +640,7 @@ router.get("/absentees/date/:date", async (req, res) => {
         res.json(absentees.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -660,7 +652,7 @@ router.get("/absentees/resident/:id", async (req, res) => {
         res.json(absentees.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -682,7 +674,7 @@ router.get("/absent/:id/:date", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -693,7 +685,7 @@ router.get("/tokens", async (req, res) => {
         res.json(token_ids.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -706,7 +698,7 @@ router.get("/tokens/owner/:id", async (req, res) => {
         res.json(token_ids);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -718,7 +710,7 @@ router.get("/tokens/date/:date", async (req, res) => {
         res.json(tokens.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -730,7 +722,7 @@ router.get("/password/:id", async (req, res) => {
         res.json(password.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
@@ -760,15 +752,15 @@ router.get("/user/type/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
 // Get residents of supervisor
-router.get("/residents/:id", async (req, res) => {
+router.get("/block/residents/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const residents = await pool.query("SELECT id FROM resident WHERE block_id = (SELECT block_id FROM supervisor WHERE id = $1)", [id]);
+        const residents = await pool.query("SELECT id, name, room_no FROM resident R JOIN app_user U ON U.id = R.id WHERE block_id = (SELECT block_id FROM supervisor WHERE id = $1)", [id]);
         res.json(residents.rows);
     } catch (err) {
         console.log(err.message);
