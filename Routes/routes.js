@@ -734,4 +734,34 @@ router.get("/password/:id", async (req, res) => {
     }
 })
 
+// Get user type
+router.get("/user/type/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
+        const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
+        const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
+        const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
+
+        if (is_resident.rowCount) {
+            res.json({ "Type": "Resident" });
+        }
+        else if (is_rt.rowCount) {
+            res.json({ "Type": "Resident Tutor" });
+        }
+        else if (is_supervisor.rowCount) {
+            res.json({ "Type": "Supervisor" });
+        }
+        else if (is_staff.rowCount) {
+            res.json({ "Type": "Office Staff" });
+        }
+        else {
+            res.json({ "Type": 0 });
+        }
+    } catch (err) {
+        console.log(err.message);
+        res.json({ "message": "ERROR" });
+    }
+})
+
 module.exports = router;
