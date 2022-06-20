@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json());
 app.use('', routes);
 
-app.get('*', (req, res) => {
+app.get('/check', (req, res) => {
     try {
         res.json({ "SUCCESS": ":)" });
     } catch (err) {
