@@ -8,13 +8,13 @@ const pool = require("../Database/db");
 router.post("/new/user", async (req, res) => {
     try {
         const { id, name, email, phone_no, password } = req.body;
-        const newUser = await pool.query("INSERT INTO app_user (id, name, email, phone_no) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, name, email, phone_no, password]);
+        const newUser = await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, name, email, phone_no, password]);
         res.json(newUser.rows[0]);
         console.log("Successfully Inserted!");
     } catch (err) {
         console.error(err.message);
         console.log("The row was NOT inserted");
-        res.json();
+        res.json({ "message": err.message });
     }
 });
 
@@ -30,7 +30,7 @@ router.post("/new/resident", async (req, res) => {
         res.json(newResident.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -39,7 +39,7 @@ router.post("/new/rt", async (req, res) => {
     try {
         const { id, name, email, phone_no, room_no, password } = req.body;
         const block_id = room_no.slice(0, 1);
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newRT = await pool.query("INSERT INTO resident_tutor (id, room_no) VALUES($1, $2) RETURNING *", [id, room_no]);
         console.log("Created new resident tutor.");
@@ -49,7 +49,7 @@ router.post("/new/rt", async (req, res) => {
     }
     catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -57,7 +57,7 @@ router.post("/new/rt", async (req, res) => {
 router.post("/new/supervisor", async (req, res) => {
     try {
         const { id, name, email, phone_no, block_id, password } = req.body;
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newSupervisor = await pool.query("INSERT INTO supervisor (id, block_id) VALUES($1, $2) RETURNING *", [id, block_id]);
         console.log("Created new supervisor.");
@@ -65,7 +65,7 @@ router.post("/new/supervisor", async (req, res) => {
     }
     catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -73,7 +73,7 @@ router.post("/new/supervisor", async (req, res) => {
 router.post("/new/staff", async (req, res) => {
     try {
         const { id, name, email, phone_no, password } = req.body;
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newStaff = await pool.query("INSERT INTO office_staff (id) VALUES($1) RETURNING *", [id]);
         console.log("Created new supervisor.");
@@ -81,7 +81,7 @@ router.post("/new/staff", async (req, res) => {
     }
     catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -95,7 +95,7 @@ router.post("/new/event", async (req, res) => {
     }
     catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -108,7 +108,7 @@ router.post("/new/attendance", async (req, res) => {
         res.json(newAttendance.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -121,7 +121,7 @@ router.post("/new/absentee", async (req, res) => {
         res.json(newAbsentee.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -146,7 +146,7 @@ router.post("/new/token", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -160,7 +160,7 @@ router.delete("/resident/:id", async (req, res) => {
         res.json(delResident.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -173,7 +173,7 @@ router.delete("/rt/:id", async (req, res) => {
         res.json(delRT.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -186,7 +186,7 @@ router.delete("/supervisor/:id", async (req, res) => {
         res.json(delSupervisor.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -199,7 +199,7 @@ router.delete("/staff/:id", async (req, res) => {
         res.json(delStaff.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -212,7 +212,7 @@ router.delete("/event/:id", async (req, res) => {
         res.json(delEvent.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -225,7 +225,7 @@ router.delete("/attendance/:date", async (req, res) => {
         res.json(delDate.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -239,7 +239,7 @@ router.delete("/absentee/:id", async (req, res) => {
         res.json(delAbsentee.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -252,7 +252,7 @@ router.delete("/token/:id", async (req, res) => {
         res.json(delToken.rows[0]);
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -299,7 +299,7 @@ router.put("/resident/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -343,7 +343,7 @@ router.put("/rt/:id", async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.json();
+        res.json({ "message": err.message });
     }
 })
 
@@ -772,7 +772,7 @@ router.get("/residents/:id", async (req, res) => {
         res.json(residents.rows);
     } catch (err) {
         console.log(err.message);
-        res.json({ "message": "ERROR" });
+        res.json({ "message": err.message });
     }
 })
 
