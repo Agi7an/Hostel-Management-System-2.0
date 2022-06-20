@@ -7,8 +7,8 @@ const pool = require("../Database/db");
 // Insert app_user
 router.post("/new/user", async (req, res) => {
     try {
-        const { id, name, email, phone_no } = req.body;
-        const newUser = await pool.query("INSERT INTO app_user (id, name, email, phone_no) VALUES($1, $2, $3, $4) RETURNING *", [id, name, email, phone_no]);
+        const { id, name, email, phone_no, password } = req.body;
+        const newUser = await pool.query("INSERT INTO app_user (id, name, email, phone_no) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, name, email, phone_no, password]);
         res.json(newUser.rows[0]);
         console.log("Successfully Inserted!");
     } catch (err) {
@@ -21,9 +21,9 @@ router.post("/new/user", async (req, res) => {
 // Insert resident
 router.post("/new/resident", async (req, res) => {
     try {
-        const { id, name, email, phone_no, room_no, course, department } = req.body;
+        const { id, name, email, phone_no, room_no, course, department, password } = req.body;
         const block_id = room_no.slice(0, 1);
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no) VALUES($1, $2, $3, $4)", [id, name, email, phone_no]);
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newResident = await pool.query("INSERT INTO resident (id, room_no, course, department, block_id) VALUES($1, $2, $3, $4, $5) RETURNING *", [id, room_no, course, department, block_id]);
         console.log("Created new resident.");
@@ -37,9 +37,9 @@ router.post("/new/resident", async (req, res) => {
 // Insert resident tutor
 router.post("/new/rt", async (req, res) => {
     try {
-        const { id, name, email, phone_no, room_no } = req.body;
+        const { id, name, email, phone_no, room_no, password } = req.body;
         const block_id = room_no.slice(0, 1);
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4)", [id, name, email, phone_no]);
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newRT = await pool.query("INSERT INTO resident_tutor (id, room_no) VALUES($1, $2) RETURNING *", [id, room_no]);
         console.log("Created new resident tutor.");
@@ -56,8 +56,8 @@ router.post("/new/rt", async (req, res) => {
 // Insert supervisor
 router.post("/new/supervisor", async (req, res) => {
     try {
-        const { id, name, email, phone_no, block_id } = req.body;
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4)", [id, name, email, phone_no]);
+        const { id, name, email, phone_no, block_id, password } = req.body;
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newSupervisor = await pool.query("INSERT INTO supervisor (id, block_id) VALUES($1, $2) RETURNING *", [id, block_id]);
         console.log("Created new supervisor.");
@@ -72,8 +72,8 @@ router.post("/new/supervisor", async (req, res) => {
 // Insert office staff
 router.post("/new/staff", async (req, res) => {
     try {
-        const { id, name, email, phone_no } = req.body;
-        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4)", [id, name, email, phone_no]);
+        const { id, name, email, phone_no, password } = req.body;
+        await pool.query("INSERT INTO app_user (id, name, email, phone_no ) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newStaff = await pool.query("INSERT INTO office_staff (id) VALUES($1) RETURNING *", [id]);
         console.log("Created new supervisor.");
@@ -256,13 +256,14 @@ router.delete("/token/:id", async (req, res) => {
     }
 })
 
+
 // UPDATES
 
 // Update Resident
 router.put("/resident/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { new_id, name, email, phone_no, room_no, course, department } = req.body;
+        const { new_id, name, email, phone_no, room_no, course, department, password } = req.body;
         if (name) {
             await pool.query("UPDATE app_user SET name = $1 WHERE id = $2", [name, id]);
         }
@@ -281,7 +282,10 @@ router.put("/resident/:id", async (req, res) => {
             await pool.query("UPDATE resident SET course = $1 WHERE id = $2", [course, id]);
         }
         if (department) {
-            await pool.query("UPDATE aresident SET department = $1 WHERE id = $2", [department, id]);
+            await pool.query("UPDATE resident SET department = $1 WHERE id = $2", [department, id]);
+        }
+        if (password) {
+            await pool.query("UPDATE app_user SET password = $1", [password]);
         }
 
         if (new_id) {
@@ -303,7 +307,7 @@ router.put("/resident/:id", async (req, res) => {
 router.put("/rt/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { new_id, name, email, phone_no, room_no } = req.body;
+        const { new_id, name, email, phone_no, room_no, password } = req.body;
         if (name) {
             await pool.query("UPDATE app_user SET name = $1 WHERE id = $2", [name, id]);
         }
@@ -312,6 +316,9 @@ router.put("/rt/:id", async (req, res) => {
         }
         if (phone_no) {
             await pool.query("UPDATE app_user SET phone_no = $1 WHERE id = $2", [phone_no, id]);
+        }
+        if (password) {
+            await pool.query("UPDATE app_user SET password = $1", [password]);
         }
         if (room_no) {
             const new_block_id = room_no.slice(0, 1);
@@ -344,7 +351,7 @@ router.put("/rt/:id", async (req, res) => {
 router.put("/supervisor/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { new_id, name, email, phone_no, block_id } = req.body;
+        const { new_id, name, email, phone_no, block_id, password } = req.body;
         if (name) {
             await pool.query("UPDATE app_user SET name = $1 WHERE id = $2", [name, id]);
         }
@@ -353,6 +360,9 @@ router.put("/supervisor/:id", async (req, res) => {
         }
         if (phone_no) {
             await pool.query("UPDATE app_user SET phone_no = $1 WHERE id = $2", [phone_no, id]);
+        }
+        if (password) {
+            await pool.query("UPDATE app_user SET password = $1", [password]);
         }
         if (block_id) {
             await pool.query("UPDATE supervisor SET block_id = $1 WHERE id = $2", [block_id, id]);
@@ -377,7 +387,7 @@ router.put("/supervisor/:id", async (req, res) => {
 router.put("/staff/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { new_id, name, email, phone_no } = req.body;
+        const { new_id, name, email, phone_no, password } = req.body;
         if (name) {
             await pool.query("UPDATE app_user SET name = $1 WHERE id = $2", [name, id]);
         }
@@ -386,6 +396,9 @@ router.put("/staff/:id", async (req, res) => {
         }
         if (phone_no) {
             await pool.query("UPDATE app_user SET phone_no = $1 WHERE id = $2", [phone_no, id]);
+        }
+        if (password) {
+            await pool.query("UPDATE app_user SET password = $1", [password]);
         }
 
         if (new_id) {
