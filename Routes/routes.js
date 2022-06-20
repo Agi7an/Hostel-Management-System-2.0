@@ -760,7 +760,7 @@ router.get("/user/type/:id", async (req, res) => {
 router.get("/block/residents/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const residents = await pool.query("SELECT id, name, room_no FROM resident R JOIN app_user U ON U.id = R.id WHERE block_id = (SELECT block_id FROM supervisor WHERE id = $1)", [id]);
+        const residents = await pool.query("SELECT U.id, U.name, R.room_no FROM resident R JOIN app_user U ON U.id = R.id WHERE block_id = (SELECT block_id FROM supervisor WHERE id = $1)", [id]);
         res.json(residents.rows);
     } catch (err) {
         console.log(err.message);
