@@ -709,4 +709,16 @@ router.get("/tokens/date/:date", async (req, res) => {
     }
 })
 
+// Get password of an user
+router.get("/password/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const password = await pool.query("SELECT password from app_user WHERE id = $1", [id]);
+        res.json(password.rows[0]);
+    } catch (err) {
+        console.log(err.message);
+        res.json({ "message": "ERROR" });
+    }
+})
+
 module.exports = router;
