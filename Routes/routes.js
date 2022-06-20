@@ -764,4 +764,16 @@ router.get("/user/type/:id", async (req, res) => {
     }
 })
 
+// Get residents of supervisor
+router.get("/residents/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const residents = await pool.query("SELECT id FROM resident WHERE block_id = (SELECT block_id FROM supervisor WHERE id = $1)", [id]);
+        res.json(residents.rows);
+    } catch (err) {
+        console.log(err.message);
+        res.json({ "message": "ERROR" });
+    }
+})
+
 module.exports = router;
