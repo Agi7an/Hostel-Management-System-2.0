@@ -650,7 +650,7 @@ router.get("/staff/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const staff = await pool.query("SELECT U.id, name, email, phone_no FROM app_user U JOIN office_staff S ON U.id = S.id WHERE S.id = $1", [id]);
-        const events = await pool.query("SELECT E.event_id, name FROM Event E JOIN event_incharge EI ON staff_id = $1", [id]);
+        const events = await pool.query("SELECT E.event_id, name FROM Event E JOIN event_incharge EI ON E.event_id = EI.event_id WHERE staff_id = $1", [id]);
         staff.rows[0]["Type"] = "Office Staff";
         staff.rows[0]["Events"] = events.rows;
         res.json(staff.rows[0]);
