@@ -147,7 +147,7 @@ router.post("/login", async (req, res) => {
     try {
         const { id, password } = req.body;
         const success = await pool.query("SELECT login($1, $2)", [id, password]);
-        if (success) {
+        if (success.rows[0] === 1) {
             const details = await pool.query("SELECT id, name, email, phone_no FROM app_user WHERE id = $1", [id]);
 
             // Get User Type
@@ -724,7 +724,6 @@ router.get("/absent/:id/:date", async (req, res) => {
     try {
         const { id, date } = req.params;
         const absent = await pool.query("SELECT * FROM is_absent WHERE id = $1 AND date = $2", [id, date]);
-        console.log(absent.rows.length);
         if (absent.rows.length === 0) {
             res.json({
                 "was_absent": false
