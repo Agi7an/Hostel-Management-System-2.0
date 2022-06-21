@@ -172,7 +172,7 @@ router.post("/login", async (req, res) => {
             res.json(details.rows[0]);
         }
         else {
-            res.json({ "Authentiacation Failed": "Either user does not exist or password does not match" });
+            res.json({ "Authentiacation Failed": success.rows });
         }
     } catch (err) {
         console.log(err.message);
