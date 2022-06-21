@@ -142,6 +142,44 @@ router.post("/new/token", async (req, res) => {
     }
 })
 
+// Login
+router.post("/login", async (req, res) => {
+    try {
+        const { id, password } = req.body;
+        const success = await pool.query("SELECT login($1, $2)", [id, password]);
+        if (success) {
+            const details = await pool.query("SELECT id, name, email, phone_no FROM app_user WHERE id = $1", [id]);
+
+            // Get User Type
+            const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
+            const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
+            const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
+            const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
+
+            if (is_resident.rowCount) {
+                details.rows[0]["Type"] = "Resident";
+            }
+            else if (is_rt.rowCount) {
+                details.rows[0]["Type"] = "Resident Tutor";
+            }
+            else if (is_supervisor.rowCount) {
+                details.rows[0]["Type"] = "Supervisor";
+            }
+            else if (is_staff.rowCount) {
+                details.rows[0]["Type"] = "Office Staff";
+            }
+
+            res.json(details.rows[0]);
+        }
+        else {
+            res.json({ "Authentiacation Failed": "Either user does not exist or password does not match" });
+        }
+    } catch (err) {
+        console.log(err.message);
+        res.json({ "message": err.message });
+    }
+})
+
 // DELETE
 // Remove resident
 router.delete("/resident/:id", async (req, res) => {
@@ -598,7 +636,7 @@ router.get("/rt/:id", async (req, res) => {
 router.get("/supervisor/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const supervisor = await pool.query("SELECT U.id, name, email, phone_no, room_no FROM app_user U JOIN supervisor S ON U.id = S.id WHERE S.id = $1", [id]);
+        const supervisor = await pool.query("SELECT U.id, name, email, phone_no FROM app_user U JOIN supervisor S ON U.id = S.id WHERE S.id = $1", [id]);
         supervisor.rows[0]["Type"] = "Supervisor";
         res.json(supervisor.rows[0]);
     } catch (err) {
