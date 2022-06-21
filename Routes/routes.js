@@ -660,6 +660,16 @@ router.get("/staff/:id", async (req, res) => {
     }
 })
 
+router.get("/events/all", async (req, res) => {
+    try {
+        const events = await pool.query("SELECT * FROM event");
+        res.json(events.rows);
+    } catch (err) {
+        console.log(err.message);
+        res.json({ "message": err.message });
+    }
+})
+
 // Get details of an event
 router.get("/event/:id", async (req, res) => {
     try {
