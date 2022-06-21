@@ -623,7 +623,7 @@ router.get("/resident/:id", async (req, res) => {
 router.get("/rt/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const rt = await pool.query("SELECT U.id, name, email, phone_no, room_no, block_id, course, department FROM app_user U JOIN resident_tutor RT ON U.id = RT.id WHERE RT.id = $1", [id]);
+        const rt = await pool.query("SELECT U.id, name, email, phone_no, room_no FROM app_user U JOIN resident_tutor RT ON U.id = RT.id WHERE RT.id = $1", [id]);
         rt.rows[0]["Type"] = "Resident Tutor";
         res.json(rt.rows[0]);
     } catch (err) {
@@ -650,7 +650,9 @@ router.get("/staff/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const staff = await pool.query("SELECT U.id, name, email, phone_no FROM app_user U JOIN office_staff S ON U.id = S.id WHERE S.id = $1", [id]);
+        const events = await pool.query("SELECT E.event_id, name FROM Event E JOIN event_incharge EI ON staff_id = $1", [id]);
         staff.rows[0]["Type"] = "Office Staff";
+        staff.rows[0]["Events"] = events.rows;
         res.json(staff.rows[0]);
     } catch (err) {
         console.log(err.message);
