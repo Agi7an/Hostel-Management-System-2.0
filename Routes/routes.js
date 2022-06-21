@@ -559,9 +559,6 @@ router.get("/user/:id", async (req, res) => {
         else if (is_staff.rowCount) {
             details.rows[0]["Type"] = "Office Staff";
         }
-        else {
-            details.rows[0]["Type"] = 0;
-        }
 
         res.json(details.rows[0]);
     } catch (err) {
@@ -575,6 +572,7 @@ router.get("/resident/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const resident = await pool.query("SELECT * FROM app_user U JOIN resident R ON U.id = R.id WHERE R.id = $1", [id]);
+        resident.rows[0]["Type"] = "Resident";
 
         res.json(resident.rows[0]);
     } catch (err) {
@@ -588,6 +586,7 @@ router.get("/rt/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const rt = await pool.query("SELECT * FROM app_user U JOIN resident_tutor RT ON U.id = RT.id WHERE RT.id = $1", [id]);
+        rt.rows[0]["Type"] = "Resident Tutor";
         res.json(rt.rows[0]);
     } catch (err) {
         console.log(err.message);
@@ -600,6 +599,7 @@ router.get("/supervisor/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const supervisor = await pool.query("SELECT * FROM app_user U JOIN supervisor S ON U.id = S.id WHERE S.id = $1", [id]);
+        supervisor.rows[0]["Type"] = "Supervisor";
         res.json(supervisor.rows[0]);
     } catch (err) {
         console.log(err.message);
@@ -612,6 +612,7 @@ router.get("/staff/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const staff = await pool.query("SELECT * FROM app_user U JOIN office_staff S ON U.id = S.id WHERE S.id = $1", [id]);
+        staff.rows[0]["Type"] = "Office Staff";
         res.json(staff.rows[0]);
     } catch (err) {
         console.log(err.message);
