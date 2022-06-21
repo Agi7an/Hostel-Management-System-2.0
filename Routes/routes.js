@@ -147,7 +147,7 @@ router.post("/login", async (req, res) => {
     try {
         const { id, password } = req.body;
         const success = await pool.query("SELECT login($1, $2)", [id, password]);
-        if (success.rows[0] === 1) {
+        if (success.rows[0]["login"] === 1) {
             const details = await pool.query("SELECT id, name, email, phone_no FROM app_user WHERE id = $1", [id]);
 
             // Get User Type
@@ -172,7 +172,7 @@ router.post("/login", async (req, res) => {
             res.json(details.rows[0]);
         }
         else {
-            res.json({ "Authentiacation Failed": success.rows });
+            res.json({ "Authentiacation Failed": "Either user does not exist or password does not match" });
         }
     } catch (err) {
         console.log(err.message);
