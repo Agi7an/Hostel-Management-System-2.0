@@ -540,6 +540,29 @@ router.get("/user/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const details = await pool.query("SELECT * FROM app_user WHERE id = $1", [id]);
+
+        // Get User Type
+        const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
+        const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
+        const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
+        const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
+
+        if (is_resident.rowCount) {
+            details.rows[0]["Type"] = "Resident";
+        }
+        else if (is_rt.rowCount) {
+            details.rows[0]["Type"] = "Resident Tutor";
+        }
+        else if (is_supervisor.rowCount) {
+            details.rows[0]["Type"] = "Supervisor";
+        }
+        else if (is_staff.rowCount) {
+            details.rows[0]["Type"] = "Office Staff";
+        }
+        else {
+            details.rows[0]["Type"] = 0;
+        }
+
         res.json(details.rows[0]);
     } catch (err) {
         console.log(err.message);
@@ -552,6 +575,7 @@ router.get("/resident/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const resident = await pool.query("SELECT * FROM app_user U JOIN resident R ON U.id = R.id WHERE R.id = $1", [id]);
+
         res.json(resident.rows[0]);
     } catch (err) {
         console.log(err.message);
