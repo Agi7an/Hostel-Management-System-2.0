@@ -151,23 +151,8 @@ router.post("/login", async (req, res) => {
             const details = await pool.query("SELECT id, name, email, phone_no FROM app_user WHERE id = $1", [id]);
 
             // Get User Type
-            const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
-            const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
-            const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
-            const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
-
-            if (is_resident.rowCount) {
-                details.rows[0]["Type"] = "Resident";
-            }
-            else if (is_rt.rowCount) {
-                details.rows[0]["Type"] = "Resident Tutor";
-            }
-            else if (is_supervisor.rowCount) {
-                details.rows[0]["Type"] = "Supervisor";
-            }
-            else if (is_staff.rowCount) {
-                details.rows[0]["Type"] = "Office Staff";
-            }
+            const user_type = await pool.query("SELECT get_user_type($1)", [id]);
+            details.rows[0]["Type"] = user_type.rows[0]["get_user_type"];
 
             res.json(details.rows[0]);
         }
@@ -580,23 +565,9 @@ router.get("/user/:id", async (req, res) => {
         const details = await pool.query("SELECT id, name, email, phone_no FROM app_user WHERE id = $1", [id]);
 
         // Get User Type
-        const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
-        const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
-        const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
-        const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
-
-        if (is_resident.rowCount) {
-            details.rows[0]["Type"] = "Resident";
-        }
-        else if (is_rt.rowCount) {
-            details.rows[0]["Type"] = "Resident Tutor";
-        }
-        else if (is_supervisor.rowCount) {
-            details.rows[0]["Type"] = "Supervisor";
-        }
-        else if (is_staff.rowCount) {
-            details.rows[0]["Type"] = "Office Staff";
-        }
+        // Get User Type
+        const user_type = await pool.query("SELECT get_user_type($1)", [id]);
+        details.rows[0]["Type"] = user_type.rows[0]["get_user_type"];
 
         res.json(details.rows[0]);
     } catch (err) {
@@ -804,26 +775,9 @@ router.get("/password/:id", async (req, res) => {
 router.get("/user/type/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const is_resident = await pool.query("SELECT 1 FROM resident WHERE id = $1", [id]);
-        const is_rt = await pool.query("SELECT 1 FROM resident_tutor WHERE id = $1", [id]);
-        const is_supervisor = await pool.query("SELECT 1 FROM supervisor WHERE id = $1", [id]);
-        const is_staff = await pool.query("SELECT 1 FROM office_staff WHERE id = $1", [id]);
-
-        if (is_resident.rowCount) {
-            res.json({ "Type": "Resident" });
-        }
-        else if (is_rt.rowCount) {
-            res.json({ "Type": "Resident Tutor" });
-        }
-        else if (is_supervisor.rowCount) {
-            res.json({ "Type": "Supervisor" });
-        }
-        else if (is_staff.rowCount) {
-            res.json({ "Type": "Office Staff" });
-        }
-        else {
-            res.json({ "Type": 0 });
-        }
+        // Get User Type
+        const user_type = await pool.query("SELECT get_user_type($1)", [id]);
+        res.json({ "Type": user_type.rows[0]["get_user_type"] });
     } catch (err) {
         console.log(err.message);
         res.json({ "message": err.message });
