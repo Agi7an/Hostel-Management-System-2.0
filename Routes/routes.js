@@ -76,7 +76,7 @@ router.post("/new/staff", async (req, res) => {
         await pool.query("INSERT INTO app_user (id, name, email, phone_no, password) VALUES($1, $2, $3, $4, $5)", [id, name, email, phone_no, password]);
         console.log("Created new user.");
         const newStaff = await pool.query("INSERT INTO office_staff (id) VALUES($1) RETURNING *", [id]);
-        console.log("Created new supervisor.");
+        console.log("Created new office staff.");
         res.json(newStaff.rows[0]);
     }
     catch (err) {
@@ -636,7 +636,7 @@ router.get("/rt/:id", async (req, res) => {
 router.get("/supervisor/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const supervisor = await pool.query("SELECT U.id, name, email, phone_no FROM app_user U JOIN supervisor S ON U.id = S.id WHERE S.id = $1", [id]);
+        const supervisor = await pool.query("SELECT U.id, name, email, phone_no, block_id FROM app_user U JOIN supervisor S ON U.id = S.id WHERE S.id = $1", [id]);
         supervisor.rows[0]["Type"] = "Supervisor";
         res.json(supervisor.rows[0]);
     } catch (err) {
